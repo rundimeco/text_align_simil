@@ -3,7 +3,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 import re
 from pathlib import Path
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
+base_dir = "Alignements"
+os.makedirs(f"{base_dir}", exist_ok = True)
 corpus = {}
 
 #Note pour plus tard : sur un Path on peut faire .glob
@@ -22,7 +25,9 @@ for chemin in glob.glob("data/noisy/brut/*.txt"):
       brut[name] = texte
 
 for name, lines_corrigee in corpus.items():
-  w = open(f"alignement_{name}.txt", "w")
+  out_name = f"{base_dir}/alignement_{name}.tsv"
+  print(f"Aligning {name}")
+  w = open(out_name, "w")
   w.write("Similarité\tLigne Corrigée\tLigne Brute\n")
   vectorizer = CountVectorizer(analyzer="char", ngram_range= (2,3))
   NB_corrigees = len(lines_corrigee)
@@ -39,3 +44,4 @@ for name, lines_corrigee in corpus.items():
         br = re.sub("\r|\n", "", lines_brut[pos[0]])
         w.write(f"{maxi}\t{corr}\t{br}\n")
   w.close()
+  print(f"Written : {out_name}")
